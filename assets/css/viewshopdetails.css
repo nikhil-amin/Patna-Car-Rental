@@ -1,0 +1,102 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 17, 2017, 9:44:17 PM
+    Author     : Roshan Raj
+*/
+#section1 {
+	padding-top:50px;
+	padding-bottom: 5px;
+	height:100%;
+	color: #fff;
+	opacity: 0.8;
+	background-image: url(forcust.jpg);
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+        width: 100%;
+	opacity: 0.7;
+}
+.btn-custom {
+ color:#bdc3c7;
+ font-size:18px;
+ border:1px solid #bdc3c7;
+}
+.btn-custom:hover {
+ color:#ffffff;
+ border:1px solid #ffffff;
+}
+#pricing-table {
+ padding-top:50px;
+}
+#pricing-table .pricing {
+ marign:0;
+ padding:0;
+ font-family:'Robot',sans-serif;
+}
+#pricing-table .pricing .pricing-table {
+ padding-bottom:30px;
+}
+#pricing-table .pricing .pricing-table .pricing-header {
+ position:relative;background-color: black;
+ padding:22px 22px;
+ text-align:center;
+ border-top-right-radius:4px;
+ border-top-left-radius:4px;
+}
+#pricing-table .pricing .pricing-table .pricing-header .pricing-title {
+ color:#ffffff;
+ text-transform:uppercase;
+ letter-spacing:2px;
+ font-size:24px;
+ text-align:center;
+ font-weight:700;
+}
+#pricing-table .pricing .pricing-table .pricing-header .pricing-rate {
+ font-size:70px;
+ font-weight:700;
+ color:#ffffff;
+ position:relative;
+ text-align:center;
+}
+#pricing-table .pricing .pricing-table .pricing-header .pricing-rate sup {
+ font-size:24px;
+ position:relative;
+ top:-30px;
+ color:#bdc3c7;
+}
+#pricing-table .pricing .pricing-table .pricing-header .pricing-rate span {
+ font-size:16px;
+ color:#bdc3c7;
+ text-transform:uppercase;
+}
+#pricing-table .pricing .pricing-list {
+ padding:20px 0 40px 0;
+ background:#ffffff;
+ border:1px solid #e3e3e3;
+}
+#pricing-table .pricing .pricing-list ul {
+ padding:0px;
+ display:table;
+ margin:0px auto;
+}
+#pricing-table .pricing .pricing-list ul li {
+ list-style:none;
+ border-bottom:1px solid #EAECEB;
+ color:black;
+ font-size:16px;
+ line-height:42px;
+}
+#pricing-table .pricing .pricing-list ul li:last-child {
+ border:none;
+}
+#pricing-table .pricing .pricing-list ul li i {
+ margin-right:12px;
+ color:#bdc3c7;
+}
+#pricing-table .pricing .pricing-list ul li span {
+ color:#34495e;
+}
