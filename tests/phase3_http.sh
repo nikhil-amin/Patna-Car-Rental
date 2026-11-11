@@ -5,6 +5,10 @@ PORT=8099; B=http://127.0.0.1:$PORT; PASS=0; FAIL=0
 php -S 127.0.0.1:$PORT -t public >/tmp/php_t.log 2>&1 & SRV=$!
 trap 'kill $SRV 2>/dev/null; mysql carrental -e "DELETE FROM rentedcars WHERE customer_username=\"diwakar\" AND booking_status=\"confirmed\" AND fare=-1; DELETE FROM customers WHERE customer_username IN (\"newuser1\"); DELETE FROM feedback WHERE name=\"Test Sender\"" 2>/dev/null' EXIT
 sleep 1
+# Use an ephemeral credential for the seeded test accounts instead of a shared default.
+TEST_PASSWORD="DriveEase_$(php -r 'echo bin2hex(random_bytes(8));')_Test"
+USER_PASSWORD="$TEST_PASSWORD" php database/user.php set-password customer diwakar >/dev/null
+USER_PASSWORD="$TEST_PASSWORD" php database/user.php set-password admin nikhil >/dev/null
 ok(){ if [ "$2" = "1" ]; then PASS=$((PASS+1)); echo "  PASS $1"; else FAIL=$((FAIL+1)); echo "  FAIL $1  [$3]"; fi; }
 has(){ echo "$1" | grep -qF -- "$2" && echo 1 || echo 0; }
 cnt(){ echo "$1" | grep -o "$2" | wc -l; }
@@ -60,10 +64,10 @@ echo "Auth flow"
 J=/tmp/cj_t.txt; rm -f $J
 L=$(curl -s -c $J -b $J $B/login.php); T=$(tok "$L")
 ok "login page has CSRF token"         $([ -n "$T" ] && echo 1 || echo 0)
-ok "POST without CSRF -> 403"          $([ "$(curl -s -o /dev/null -w '%{http_code}' -c $J -b $J -d 'username=diwakar&password=root' $B/login.php)" = 403 ] && echo 1 || echo 0)
+ok "POST without CSRF -> 403"          $([ "$(curl -s -o /dev/null -w '%{http_code}' -c $J -b $J -d "username=diwakar&password=$TEST_PASSWORD" $B/login.php)" = 403 ] && echo 1 || echo 0)
 R=$(curl -s -c $J -b $J -d "_csrf=$T&role=customer&username=diwakar&password=wrong" $B/login.php); ok "wrong password -> error shown" $(has "$R" "Invalid username or password")
-R=$(curl -s -c $J -b $J -d "_csrf=$T&role=admin&username=diwakar&password=root" $B/login.php); ok "customer can't use admin login"   $(has "$R" "Invalid username or password")
-CODE=$(curl -s -c $J -b $J -o /dev/null -w '%{http_code}' -d "_csrf=$T&role=customer&username=diwakar&password=root" $B/login.php); ok "valid login -> 302" $([ "$CODE" = 302 ] && echo 1 || echo 0) $CODE
+R=$(curl -s -c $J -b $J -d "_csrf=$T&role=admin&username=diwakar&password=$TEST_PASSWORD" $B/login.php); ok "customer can't use admin login"   $(has "$R" "Invalid username or password")
+CODE=$(curl -s -c $J -b $J -o /dev/null -w '%{http_code}' -d "_csrf=$T&role=customer&username=diwakar&password=$TEST_PASSWORD" $B/login.php); ok "valid login -> 302" $([ "$CODE" = 302 ] && echo 1 || echo 0) $CODE
 N=$(curl -s -c $J -b $J $B/index.php); ok "navbar shows user + role"  $([ "$(has "$N" "Diwakar Vignesh")" = 1 ] && [ "$(has "$N" ">customer<")" = 1 ] && echo 1 || echo 0)
 ok "customer nav links present"        $(has "$N" "Active rentals")
 ok "admin links hidden from customer"  $([ "$(has "$N" "Fleet")" = 0 ] && echo 1 || echo 0)
@@ -73,7 +77,7 @@ T2=$(tok "$N"); ok "logout w/o CSRF -> 403" $([ "$(curl -s -o /dev/null -w '%{ht
 curl -s -c $J -b $J -o /dev/null -d "_csrf=$T2" $B/logout.php
 ok "after logout: guest nav"           $(has "$(curl -s -c $J -b $J $B/index.php)" "Sign up")
 JA=/tmp/cj_a.txt; rm -f $JA; TA=$(tok "$(curl -s -c $JA -b $JA "$B/login.php?role=admin")")
-curl -s -c $JA -b $JA -o /dev/null -d "_csrf=$TA&role=admin&username=nikhil&password=root" $B/login.php
+curl -s -c $JA -b $JA -o /dev/null -d "_csrf=$TA&role=admin&username=nikhil&password=$TEST_PASSWORD" $B/login.php
 NA=$(curl -s -c $JA -b $JA $B/index.php); ok "admin login shows fleet nav" $([ "$(has "$NA" "Fleet")" = 1 ] && [ "$(has "$NA" "Active rentals")" = 0 ] && echo 1 || echo 0)
 ok "admin sees 'can't book' notice"    $(has "$(curl -s -b $JA "$B/car.php?id=2")" "Fleet owners can't book")
 
