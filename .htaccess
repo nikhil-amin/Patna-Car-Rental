@@ -1,0 +1,15 @@
+# DriveEase Apache front controller / web-root protection
+Options -Indexes
+RewriteEngine On
+
+# Never expose environment files or private application directories.
+RewriteRule (^|/)\. - [F,L,NC]
+RewriteRule ^(?:config|database|includes|tests|\.github)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:README\.md|HOSTING\.md|XAMPP\.md|composer\.(?:json|lock)|phpunit\.xml(?:\.dist)?)$ - [F,L,NC]
+
+# Requests already targeting public/ should be served normally.
+RewriteRule ^public/ - [L]
+
+# Keep the repository root usable while exposing only public/ as the app.
+RewriteRule ^$ public/ [L]
+RewriteRule ^(.*)$ public/$1 [L]

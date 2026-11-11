@@ -1,0 +1,40 @@
+name: PHP checks
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: PHP syntax, lifecycle and shell checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: none
+          coverage: none
+      - name: Lint all PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' files < <(find . -type f -name '*.php' -not -path './vendor/*' -print0)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No PHP files found."
+            exit 1
+          fi
+          for file in "${files[@]}"; do php -l "$file"; done
+      - name: Run database-free lifecycle regression checks
+        run: php tests/lifecycle_static_test.php
+      - name: Validate shell test scripts
+        run: |
+          set -euo pipefail
+          bash -n tests/deploy_check.sh
+          bash -n tests/phase3_http.sh
